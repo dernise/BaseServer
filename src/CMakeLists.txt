@@ -10,4 +10,5 @@ add_executable( EternalKingdom main.cpp
 				Players.hpp
 )  
 
+target_link_libraries(EternalKingdom ${Boost_LIBRARIES})
 
