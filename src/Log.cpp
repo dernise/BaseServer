@@ -61,7 +61,7 @@ void Logging::SetColor(bool stdout_stream, Color color)
         BG_MAGENTA,  BG_CYAN, BG_WHITE
     };
 
-    static unsigned char UnixColorFG[Color_count] =
+    static uint8 UnixColorFG[Color_count] =
     {
         FG_BLACK,                                           // BLACK
         FG_RED,                                             // RED
