@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.8 )  
 project( EternalKingdom )  
 
- ---- Get CPU information
+# ---- Get CPU information
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
     MESSAGE( "64 bits compiler detected" )
     SET( EX_PLATFORM 32 )

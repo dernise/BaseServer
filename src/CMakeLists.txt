@@ -1,9 +1,13 @@
 add_executable( EternalKingdom main.cpp 
-				AuthSocket.cpp 
-				AuthSocket.hpp
+				AuthServer.cpp 
+				AuthServer.hpp
+				AuthSession.hpp
 				Messages.hpp
 				Log.cpp
 				Log.hpp
+				Types.hpp
+				Players.cpp
+				Players.hpp
 )  
 
 
