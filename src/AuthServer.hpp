@@ -19,13 +19,13 @@ public:
 
   void start_accept()
   {
-    chat_session_ptr new_session(new chat_session(io_service_, room_));
+    auth_session_ptr new_session(new chat_session(io_service_, connected_players));
     acceptor_.async_accept(new_session->socket(),
         boost::bind(&chat_server::handle_accept, this, new_session,
           boost::asio::placeholders::error));
   }
 
-  void handle_accept(chat_session_ptr session,
+  void handle_accept(auth_session_ptr session,
       const boost::system::error_code& error)
   {
     if (!error)
@@ -39,7 +39,7 @@ public:
 private:
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;
-  Players room_;
+  Players connected_players;
 };
 
 typedef boost::shared_ptr<chat_server> chat_server_ptr;

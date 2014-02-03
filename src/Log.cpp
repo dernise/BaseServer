@@ -105,7 +105,7 @@ std::string Logging::getCurrentTime()
     return buf;
 }
 
-void Logging::outString(const char* str, ...)
+void Logging::outString(const char* str, ...) // Do not go higher than 1024
 {
     if (!str)
       return;

@@ -3,6 +3,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
 #include <iostream>
+#include <string.h>
 #include "Messages.hpp"
 #include "Players.hpp"
 using boost::asio::ip::tcp;
@@ -26,7 +27,7 @@ public:
   void start()
   {
     room_.join(shared_from_this());
-	std::cout << "A new client connected" << std::endl;
+    sLog.outString("A new client connected : %s", socket_.remote_endpoint().address().to_string().c_str());
     boost::asio::async_read(socket_,
         boost::asio::buffer(read_msg_.data(), chat_message::header_length),
         boost::bind(
@@ -106,4 +107,4 @@ private:
   chat_message_queue write_msgs_;
 };
 
-typedef boost::shared_ptr<chat_session> chat_session_ptr;
+typedef boost::shared_ptr<chat_session> auth_session_ptr;
