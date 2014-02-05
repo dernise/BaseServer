@@ -6,10 +6,10 @@
 
 using boost::asio::ip::tcp;
 
-class chat_server
+class AuthServer
 {
 public:
-  chat_server(boost::asio::io_service& io_service,
+  AuthServer(boost::asio::io_service& io_service,
       const tcp::endpoint& endpoint)
     : io_service_(io_service),
       acceptor_(io_service, endpoint)
@@ -19,9 +19,9 @@ public:
 
   void start_accept()
   {
-    auth_session_ptr new_session(new chat_session(io_service_, connected_players));
+    auth_session_ptr new_session(new AuthSession(io_service_, players));
     acceptor_.async_accept(new_session->socket(),
-        boost::bind(&chat_server::handle_accept, this, new_session,
+        boost::bind(&AuthServer::handle_accept, this, new_session,
           boost::asio::placeholders::error));
   }
 
@@ -39,7 +39,7 @@ public:
 private:
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;
-  Players connected_players;
+  Players players;
 };
 
-typedef boost::shared_ptr<chat_server> chat_server_ptr;
+typedef boost::shared_ptr<AuthServer> AuthServer_ptr;

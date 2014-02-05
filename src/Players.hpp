@@ -10,6 +10,7 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include "Messages.hpp"
+#include "Log.hpp"
 
 typedef std::deque<chat_message> chat_message_queue;
 
@@ -20,21 +21,23 @@ public:
   virtual void deliver(const chat_message& msg) = 0;
 };
 
-typedef boost::shared_ptr<Player> chat_participant_ptr;
+typedef boost::shared_ptr<Player> playerPtr;
 
 class Players
 {
 public:
-  void join(chat_participant_ptr participant)
+  void join(playerPtr player)
   {
-    participants_.insert(participant);
+    connectedPlayers.insert(player);
     std::for_each(recent_msgs_.begin(), recent_msgs_.end(),
-        boost::bind(&Player::deliver, participant, _1));
+        boost::bind(&Player::deliver, player, _1));
   }
 
-  void leave(chat_participant_ptr participant)
+  void remove(playerPtr player)
   {
-    participants_.erase(participant);
+      connectedPlayers.erase(player);
+      sLog.outString("removed player");
+    
   }
 
   void deliver(const chat_message& msg)
@@ -43,12 +46,12 @@ public:
     while (recent_msgs_.size() > max_recent_msgs)
       recent_msgs_.pop_front();
 
-    std::for_each(participants_.begin(), participants_.end(),
+    std::for_each(connectedPlayers.begin(), connectedPlayers.end(),
         boost::bind(&Player::deliver, _1, boost::ref(msg)));
   }
 
 private:
-  std::set<chat_participant_ptr> participants_;
+  std::set<playerPtr> connectedPlayers;
   enum { max_recent_msgs = 100 };
   chat_message_queue recent_msgs_;
 };

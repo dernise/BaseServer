@@ -4,80 +4,37 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <boost/iostreams/device/array.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include "Types.hpp"
+#include "Log.hpp"
 
-class chat_message
-{
+class AuthPacket{
 public:
-  enum { header_length = 4 };
-  enum { max_body_length = 512 };
-
-  chat_message()
-    : body_length_(0)
-  {
-  }
-
-  const char* data() const
-  {
-    return data_;
-  }
-
-  char* data()
-  {
-    return data_;
-  }
-
-  size_t length() const
-  {
-    return header_length + body_length_;
-  }
-
-  const char* body() const
-  {
-    return data_ + header_length;
-  }
-
-  char* body()
-  {
-    return data_ + header_length;
-  }
-
-  size_t body_length() const
-  {
-    return body_length_;
-  }
-
-  void body_length(size_t new_length)
-  {
-    body_length_ = new_length;
-    if (body_length_ > max_body_length)
-      body_length_ = max_body_length;
-  }
-
-  bool decode_header()
-  {
-    using namespace std; // For strncat and atoi.
-    char header[header_length + 1] = "";
-    strncat(header, data_, header_length);
-    body_length_ = atoi(header);
-    if (body_length_ > max_body_length)
-    {
-      body_length_ = 0;
-      return false;
+    AuthPacket();
+    void setOpCode(int popCode){ opCode = popCode; }
+    
+    boost::archive::binary_oarchive getDataStream(){
+        boost::iostreams::back_insert_device<std::string> inserter(data);
+        boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+        boost::archive::binary_oarchive oa(s);
+        return oa
     }
-    return true;
-  }
-
-  void encode_header()
-  {
-    using namespace std; // For sprintf and memcpy.
-    char header[header_length + 1] = "";
-    sprintf(header, "%4d", body_length_);
-    memcpy(data_, header, header_length);
-  }
-
+    
+    void constructPacket(){
+        
+    }
 private:
-  char data_[header_length + max_body_length];
-  size_t body_length_;
+    uint16 length;
+    uint16 opCode;
+    char data[1024];
+    char packet[1024];
 };
 
+
 #endif // CHAT_MESSAGE_HPP
+
+

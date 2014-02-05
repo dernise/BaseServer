@@ -21,8 +21,8 @@ int main(int argc, char* argv[])
         sLog.outString(" | (__/ _ \\  _|  _/ -_) -_)  ");
         sLog.outString("  \\___\\___/_| |_| \\___\\___| AuthServer 0.1");
 		boost::asio::io_service io_service;
-        tcp::endpoint endpoint(tcp::v4(), 12121);
-        chat_server_ptr server(new chat_server(io_service, endpoint));
+        tcp::endpoint endpoint(tcp::v4(), 8080);
+        AuthServer_ptr server(new AuthServer(io_service, endpoint));
         sLog.outString("Done");
         io_service.run();
     }
