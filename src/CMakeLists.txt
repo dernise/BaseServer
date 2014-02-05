@@ -8,8 +8,10 @@ add_executable( EternalKingdom main.cpp
 				Types.hpp
 				Players.cpp
 				Players.hpp
-                                ByteBuffer.hpp
+                ByteBuffer.hpp
 				ByteBuffer.cpp
+				Opcodes.hpp
+				Opcodes.cpp
 )  
 
 target_link_libraries(EternalKingdom ${Boost_LIBRARIES})

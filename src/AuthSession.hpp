@@ -28,9 +28,6 @@ public:
     {
         playerList.join(shared_from_this());
         sLog.outString("A new client connected : %s", socket_.remote_endpoint().address().to_string().c_str());
-        chat_message welcomeMessage;
-        welcomeMessage.message_string("Hello, world!");
-        deliver(welcomeMessage);
         boost::asio::async_read(socket_,
             boost::asio::buffer(read_msg_.data(), chat_message::header_length),
                 boost::bind(&AuthSession::handle_read_header, shared_from_this(),
