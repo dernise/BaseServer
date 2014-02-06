@@ -12,13 +12,13 @@
 #include "Messages.hpp"
 #include "Log.hpp"
 
-typedef std::deque<chat_message> chat_message_queue;
+typedef std::deque<AuthPacket> auth_message_queue;
 
 class Player
 {
 public:
   virtual ~Player() {}
-  virtual void deliver(const chat_message& msg) = 0;
+  virtual void deliver(const AuthPacket& msg) = 0;
 };
 
 typedef boost::shared_ptr<Player> playerPtr;
@@ -40,7 +40,7 @@ public:
     
   }
 
-  void deliver(const chat_message& msg)
+  void deliver(const AuthPacket& msg)
   {
     recent_msgs_.push_back(msg);
     while (recent_msgs_.size() > max_recent_msgs)
@@ -53,5 +53,5 @@ public:
 private:
   std::set<playerPtr> connectedPlayers;
   enum { max_recent_msgs = 100 };
-  chat_message_queue recent_msgs_;
+  auth_message_queue recent_msgs_;
 };

@@ -8,8 +8,12 @@
 
 class AuthPacket : public ByteBuffer {
 public:
-	AuthPacket(); 
-    AuthPacket(const AuthPacket& packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode)
+    AuthPacket()                                       : ByteBuffer(0), m_opcode(0x00)
+    {
+    }
+    explicit AuthPacket(uint16 opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode) { }
+    
+	AuthPacket(const AuthPacket& packet) : ByteBuffer(packet), m_opcode(packet.m_opcode)
     {
     }
     
@@ -18,6 +22,14 @@ public:
         _storage.reserve(newres);
         m_opcode = opcode;
     }
+
+    ByteBuffer getPacket(){
+		ByteBuffer buff;
+		buff << size();
+		buff << GetOpcode();
+		buff << (char*)contents();
+		return buff;
+	}
 
 	uint16 GetOpcode() const { return m_opcode; }
     void SetOpcode(uint16 opcode) { m_opcode = opcode; }

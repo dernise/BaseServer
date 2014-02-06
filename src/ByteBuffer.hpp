@@ -299,12 +299,14 @@ class ByteBuffer
                 throw ByteBufferException(true, pos, cnt, size());
             memcpy(&_storage[pos], src, cnt);
         }
+
 	private:
         template <typename T> void append(T value)
         {
             //EndianConvert(value);
             append((uint8*)&value, sizeof(value));
         }
+
     protected:
         size_t _rpos, _wpos;
         std::vector<uint8> _storage;

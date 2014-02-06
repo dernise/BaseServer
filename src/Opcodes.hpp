@@ -3,7 +3,7 @@
 
 enum OpcodesList
 {
-	CTS_WELCOME = 0x000
-}
+	CTS_WELCOME = 0x1AF
+};
 
 #endif
