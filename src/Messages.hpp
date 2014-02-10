@@ -25,7 +25,7 @@ public:
 
     ByteBuffer getPacket(){
 		ByteBuffer buff;
-		buff << size();
+		buff << (uint16)size();
 		buff << GetOpcode();
 		buff << (char*)contents();
 		return buff;

@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include "EndianConverter.hpp"
 #include "Log.hpp"
 
 class ByteBufferException
@@ -231,7 +233,7 @@ class ByteBuffer
             if (pos + sizeof(T) > size())
                 throw ByteBufferException(false, pos, sizeof(T), size());
             T val = *((T const*)&_storage[pos]);
-            //EndianConvert(val);
+            EndianConvert(val);
             return val;
         }
 
@@ -303,10 +305,9 @@ class ByteBuffer
 	private:
         template <typename T> void append(T value)
         {
-            //EndianConvert(value);
+            EndianConvert(value);
             append((uint8*)&value, sizeof(value));
         }
-
     protected:
         size_t _rpos, _wpos;
         std::vector<uint8> _storage;

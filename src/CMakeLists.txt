@@ -12,6 +12,7 @@ add_executable( EternalKingdom main.cpp
 				ByteBuffer.cpp
 				Opcodes.hpp
 				Opcodes.cpp
+				EndianConverter.hpp
 )  
 
 target_link_libraries(EternalKingdom ${Boost_LIBRARIES})
