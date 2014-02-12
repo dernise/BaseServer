@@ -25,15 +25,19 @@ public:
 
     ByteBuffer getPacket(){
 		ByteBuffer buff;
-		buff << (uint16)size();
+		headerSize = (uint16)size();
+		buff << headerSize;
 		buff << GetOpcode();
 		buff << (char*)contents();
 		return buff;
 	}
 
+	uint16 getSize() const { return headerSize; }
+    void setSize(uint16 size) { headerSize = size; }
 	uint16 GetOpcode() const { return m_opcode; }
     void SetOpcode(uint16 opcode) { m_opcode = opcode; }
 protected:
+	uint16 headerSize;
 	uint16 m_opcode;
 };
 

@@ -1,3 +1,6 @@
+#ifndef _PLAYERS_H
+#define _PLAYERS_H
+
 #include <algorithm>
 #include <cstdlib>
 #include <deque>
@@ -55,3 +58,4 @@ private:
   enum { max_recent_msgs = 100 };
   auth_message_queue recent_msgs_;
 };
+#endif

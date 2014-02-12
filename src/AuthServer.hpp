@@ -1,3 +1,6 @@
+#ifndef _AUTHSERVER_H
+#define _AUTHSERVER_H
+
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -43,3 +46,5 @@ private:
 };
 
 typedef boost::shared_ptr<AuthServer> AuthServer_ptr;
+
+#endif

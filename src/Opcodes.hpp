@@ -18,7 +18,7 @@ struct OpcodeHandler
 {
     char const* name;
     SessionStatus status;
-    void (AuthSession::*handler)(authPacket& recvPacket);
+//    void (AuthSession::*handler)(authPacket& recvPacket);
 };
 
 

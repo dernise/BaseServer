@@ -1,3 +1,6 @@
+#ifndef _AUTHSESSION_H
+#define _AUTHSESSION_H
+
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -31,10 +34,10 @@ public:
         playerList.join(shared_from_this());
         sLog.outString("A new client connected : %s", socket_.remote_endpoint().address().to_string().c_str());
 		deliver(welcomeMessage());
-		/*boost::asio::async_read(socket_,
-            boost::asio::buffer(read_msg_.data(), chat_message::header_length),
+		boost::asio::async_read(socket_,
+            boost::asio::buffer((char*)receivedMessage.contents(), 4), // 4 is the length of the header
                 boost::bind(&AuthSession::handle_read_header, shared_from_this(),
-                    boost::asio::placeholders::error));*/
+                    boost::asio::placeholders::error));
     
     }
 
@@ -60,19 +63,29 @@ public:
         }
     }
 
+	bool decodeHeader(){
+		uint16 length, opCode;
+		receivedMessage >> length;
+		receivedMessage >> opCode;
+		receivedMessage.setSize(length);
+		receivedMessage.SetOpcode(opCode);
+		return true;
+	}
+
     void handle_read_header(const boost::system::error_code& error)
     {
-        /*if (!error && read_msg_.decode_header())
+        if (!error && decodeHeader())
         {
-          boost::asio::async_read(socket_,
-            boost::asio::buffer(read_msg_.body(), read_msg_.body_length()),
+          /*boost::asio::async_read(socket_,
+            boost::asio::buffer(receivedMessage.body(), read_msg_.body_length()),
               boost::bind(&AuthSession::handle_read_body, shared_from_this(),
-                boost::asio::placeholders::error));
+                boost::asio::placeholders::error));*/
+			sLog.outString("Received authmessage lenght : %d, opCode : %d", receivedMessage.getSize(), receivedMessage.GetOpcode());
         }
         else
         {
             playerList.remove(shared_from_this());
-        }*/
+        }
     }
 
     void handle_read_body(const boost::system::error_code& error)
@@ -115,8 +128,10 @@ public:
 private:
     tcp::socket socket_;
     Players& playerList;
-    AuthPacket read_msg_;
+    AuthPacket receivedMessage;
     auth_message_queue write_msgs_;
 };
 
 typedef boost::shared_ptr<AuthSession> auth_session_ptr;
+
+#endif

@@ -13,10 +13,10 @@ class ByteBufferException
         ByteBufferException(bool _add, size_t _pos, size_t _esize, size_t _size)
             : add(_add), pos(_pos), esize(_esize), size(_size)
         {
-            PrintPosError();
+            //PrintPosError();
         }
 
-        void PrintPosError() const;
+        //void PrintPosError() const;
     private:
         bool add;
         size_t pos;
