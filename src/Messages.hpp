@@ -8,7 +8,7 @@
 
 class AuthPacket : public ByteBuffer {
 public:
-    AuthPacket()                                       : ByteBuffer(0), m_opcode(0x00)
+    AuthPacket() : ByteBuffer(0), m_opcode(0x00)
     {
     }
     explicit AuthPacket(uint16 opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode) { }

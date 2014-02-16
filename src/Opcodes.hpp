@@ -10,6 +10,7 @@ enum SessionStatus
 
 enum OpcodesList
 {
+	STD_NULL = 0x000,
 	CTS_WELCOME = 0x1AF
 };
 

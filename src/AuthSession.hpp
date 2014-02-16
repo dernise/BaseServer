@@ -34,15 +34,16 @@ public:
         playerList.join(shared_from_this());
         sLog.outString("A new client connected : %s", socket_.remote_endpoint().address().to_string().c_str());
 		deliver(welcomeMessage());
+		receivedMessage = new AuthPacket(STD_NULL, 1); //Creating the new packet
 		boost::asio::async_read(socket_,
-            boost::asio::buffer((char*)receivedMessage.contents(), 4), // 4 is the length of the header
+            boost::asio::buffer(buffer, 4),
                 boost::bind(&AuthSession::handle_read_header, shared_from_this(),
                     boost::asio::placeholders::error));
     
     }
 
 	AuthPacket welcomeMessage(){
-        AuthPacket welcomeMessage(CTS_WELCOME,1);
+        AuthPacket welcomeMessage(CTS_WELCOME,20);
 		char jungle[20] = "Welcome";
 		welcomeMessage << jungle;
 		return welcomeMessage;
@@ -65,10 +66,12 @@ public:
 
 	bool decodeHeader(){
 		uint16 length, opCode;
-		receivedMessage >> length;
-		receivedMessage >> opCode;
-		receivedMessage.setSize(length);
-		receivedMessage.SetOpcode(opCode);
+		*receivedMessage << (char*)buffer;
+		*receivedMessage >> length;
+		*receivedMessage >> opCode;
+		receivedMessage->setSize(length);
+		receivedMessage->SetOpcode(opCode);
+		sLog.outString("size : %d, opcode : %d", length, opCode); 
 		return true;
 	}
 
@@ -80,7 +83,7 @@ public:
             boost::asio::buffer(receivedMessage.body(), read_msg_.body_length()),
               boost::bind(&AuthSession::handle_read_body, shared_from_this(),
                 boost::asio::placeholders::error));*/
-			sLog.outString("Received authmessage lenght : %d, opCode : %d", receivedMessage.getSize(), receivedMessage.GetOpcode());
+			sLog.outString("Received authmessage lenght : %d, opCode : %d", receivedMessage->getSize(), receivedMessage->GetOpcode());
         }
         else
         {
@@ -93,6 +96,8 @@ public:
         /*if (!error)
         {
             playerList.deliver(read_msg_);
+			delete receivedMessage;
+			receivedMessage = new AuthPacket(STD_NULL, 1); //Creating the new packet
             boost::asio::async_read(socket_,
                 boost::asio::buffer(read_msg_.data(), chat_message::header_length),
                     boost::bind(&AuthSession::handle_read_header, shared_from_this(),
@@ -102,6 +107,7 @@ public:
         {
             playerList.remove(shared_from_this());
         }*/
+		delete receivedMessage;
     }
 
     void handle_write(const boost::system::error_code& error)
@@ -128,7 +134,8 @@ public:
 private:
     tcp::socket socket_;
     Players& playerList;
-    AuthPacket receivedMessage;
+	uint8 buffer[1024];
+    AuthPacket* receivedMessage;
     auth_message_queue write_msgs_;
 };
 
