@@ -1,19 +1,14 @@
-add_executable( EternalKingdom main.cpp 
-				AuthServer.cpp 
-				AuthServer.hpp
-				AuthSession.hpp
-				Messages.hpp
-				Log.cpp
-				Log.hpp
-				Types.hpp
-				Players.cpp
-				Players.hpp
-                ByteBuffer.hpp
-				ByteBuffer.cpp
-				Opcodes.hpp
-				Opcodes.cpp
-				EndianConverter.hpp
-)  
+file (GLOB NETWORK Network/*.cpp Network/*.hpp)
+file (GLOB UTILS Utils/*.cpp Utils/*.hpp)
+file (GLOB PLAYER Player/*.cpp Player/*.hpp)
 
-target_link_libraries(EternalKingdom ${Boost_LIBRARIES})
+init_target (kingdom_server)
 
+build_executable (${TARGET_NAME} ${NETWORK} ${UTILS} ${PLAYER} main.cpp)
+
+SOURCE_GROUP("Network" FILES ${NETWORK})
+SOURCE_GROUP("Utils" FILES ${UTILS})
+SOURCE_GROUP("Player" FILES ${PLAYER})
+
+link_boost()
+link_ssl()

@@ -20,9 +20,24 @@ IF (Boost_FOUND)
     ADD_DEFINITIONS( "-DHAS_BOOST" )
 ENDIF()
 
+# ---- Openssl
+include(cmake/FindOpenSSL.cmake)
+FIND_PACKAGE(OpenSSL REQUIRED)
+IF(OPENSSL_FOUND)
+  INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR})
+  LIST(APPEND ADDITIONAL_LIBS ${OPENSSL_LIBRARIES})
+ELSE()
+  MESSAGE( "OPENSSL NOT FOUND, WILL NOT COMPILE" )
+ENDIF()
+
 #-----------------------------------------------------------------------------
 # We provide a few modules for our own needs to find and configure uncommon
 # software on which we depend.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+# Include our cmake macros
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include (Helpers)
+
+#add_subdirectory(dep)
 add_subdirectory(src)
