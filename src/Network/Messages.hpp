@@ -49,7 +49,8 @@ public:
         length_ = length - 4;
     }
     
-    uint8 getOpcode(){ return opcode_; }
+    uint8 getLength_() const { return length_; }
+    uint8 getOpcode_() const { return opcode_; }
     void set_opcode_(uint8 opcode){ opcode_ = opcode; }
     void set_length_(uint8 length){ length_ = length; }
 protected:    
