@@ -14,7 +14,7 @@ void AuthSession::start()
 void AuthSession::deliver(const AuthMessage& msg)
 {
     ByteBuffer packet;
-    uint64 length = msg.getLength_();
+    uint32 length = msg.getLength_();
     
     packet << (uint8)130;
     if(length <= 125){
@@ -112,7 +112,7 @@ void AuthSession::decodeMask(const boost::system::error_code& error){
             received_message_->setSize(length);
         }
         else if(maskIndex == 8){
-            uint64 length = 0;
+            uint32 length = 0; //Well reading only 4 bytes, if it's > 1024 its going to kick anyway
             mask >> length;
             received_message_->setSize(length);
         }
@@ -148,7 +148,7 @@ void AuthSession::decodeMask(const boost::system::error_code& error){
 void AuthSession::decodeData(const boost::system::error_code& error){
     if (!error)
     {
-        const uint64 size=received_message_->getSize();
+        const uint32 size=received_message_->getSize();
 		uint8* mask = received_message_->getMask(), byte=0;
 		char message[1024];
         ByteBuffer extractor;
@@ -208,18 +208,19 @@ void AuthSession::parseHanshake(const boost::system::error_code& error){
         }
         
         std::string secWebSocketAccept = parser.getWebSocketAcceptKey(handshakeSecKey);
-        
-        std::string packet = parser.getHandshakeAnswer(secWebSocketAccept);
+
+        handshake_answer_ = parser.getHandshakeAnswer(secWebSocketAccept);
+		
         boost::asio::async_write(socket_,
-            boost::asio::buffer(packet,
-                packet.length()),
+			boost::asio::buffer(handshake_answer_,
+                handshake_answer_.length()),
                     boost::bind(&AuthSession::handle_write, shared_from_this(),
-                        boost::asio::placeholders::error));
+					boost::asio::placeholders::error));
         
         boost::asio::async_read(socket_,
             boost::asio::buffer(buffer_, 2),
                 boost::bind(&AuthSession::decodeHeader, shared_from_this(),
-                    boost::asio::placeholders::error));
+                   boost::asio::placeholders::error));
     }
     else
     {

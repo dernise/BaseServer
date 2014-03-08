@@ -10,10 +10,6 @@
 #include "Types.hpp"
 #include <boost/asio.hpp>
 
-#if defined (WIN32)
-	#include <SDKDDKVer.h>
-	#include <windows.h>
-#endif
 
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS

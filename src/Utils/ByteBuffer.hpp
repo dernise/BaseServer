@@ -307,7 +307,7 @@ class ByteBuffer
                 append(buffer.contents(), buffer.wpos());
         }
 
-    	void appendData(const char* header, int length){
+    	void appendData(const char* header, uint32 length){
 	        if (_storage.size() < _wpos + length)
                 _storage.resize(_wpos + length);
             memcpy(&_storage[_wpos], header, length);

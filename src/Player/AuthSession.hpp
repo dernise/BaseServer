@@ -3,6 +3,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
@@ -78,6 +79,7 @@ private:
     PlayerList& player_list_;
 	char buffer_[1024];
     boost::asio::streambuf handshake_buffer_; //We cannot use a char* buffer with async_read_until :(
+	std::string handshake_answer_;
     WebSocketMessage* received_message_;
 };
 

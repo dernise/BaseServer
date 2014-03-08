@@ -25,8 +25,8 @@ public:
 
 	uint8* getMask() const { return m_mask; }
     void setMask(uint8* mask) { m_mask = mask; }
-	uint64 getSize() const { return m_headerSize; }
-    void setSize(uint64 size) { m_headerSize = size; }
+	uint32 getSize() const { return m_headerSize; }
+    void setSize(uint32 size) { m_headerSize = size; }
 	uint16 GetOpcode() const { return m_opcode; }
     void SetOpcode(uint8 opcode) { m_opcode = opcode; }
     int GetMaskIndex() const { return m_maskIndex; }
@@ -34,7 +34,7 @@ public:
 protected:
     int m_maskIndex;
     uint8* m_mask;
-	uint64 m_headerSize;
+	uint32 m_headerSize;
 	uint8 m_opcode;
 };
 
@@ -49,7 +49,7 @@ public:
         length_ = length - 4;
     }
     
-    uint8 getLength_() const { return length_; }
+    uint16 getLength_() const { return length_; }
     uint8 getOpcode_() const { return opcode_; }
     void set_opcode_(uint8 opcode){ opcode_ = opcode; }
     void set_length_(uint8 length){ length_ = length; }
