@@ -61,7 +61,7 @@ public:
     }
 
     void start();
-    void deliver(const WebSocketMessage& msg);
+    void deliver(const AuthMessage& msg);
     void handle_write(const boost::system::error_code& error);
     void parseHanshake(const boost::system::error_code& error);
     void sendHandshakeAnswer(std::string handshakeKey);

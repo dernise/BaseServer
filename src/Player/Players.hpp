@@ -20,7 +20,7 @@ class Player
 {
 public:
   virtual ~Player() {}
-  virtual void deliver(const WebSocketMessage& msg) = 0;
+  virtual void deliver(const AuthMessage& msg) = 0;
 };
 
 typedef boost::shared_ptr<Player> playerPtr;
@@ -39,7 +39,7 @@ public:
       sLog.outString("A player left the game");
   }
 
-  void sendToAll(const WebSocketMessage& msg)
+  void sendToAll(const AuthMessage& msg)
   {
     std::for_each(connectedPlayers.begin(), connectedPlayers.end(),
         boost::bind(&Player::deliver, _1, boost::ref(msg)));

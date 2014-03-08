@@ -11,19 +11,42 @@ void AuthSession::start()
     
 }
 
-void AuthSession::deliver(const WebSocketMessage& msg)
+void AuthSession::deliver(const AuthMessage& msg)
 {
-    /*bool write_in_progress = !write_msgs_.empty();
-    write_msgs_.push_back(msg);
-    if (!write_in_progress)
+    ByteBuffer packet;
+    uint64 length = msg.getLength_();
+    
+    packet << (uint8)130;
+    if(length <= 125){
+        packet << msg.getLength_();
+    }
+    else if(length >= 126 && length <= 65535 )
     {
-        ByteBuffer packet = write_msgs_.front().getPacket();
-        boost::asio::async_write(socket_,
-            boost::asio::buffer(packet.contents(),
-                packet.size()),
-                    boost::bind(&AuthSession::handle_write, shared_from_this(),
-                        boost::asio::placeholders::error));
-    }*/
+        packet << 126;
+        packet << ((length >> 8) & 255);
+        packet << ((length) & 255);
+    }
+    else{
+        packet << 127;
+        packet << ((length >> 56) & 255);
+        packet << ((length >> 48) & 255);
+        packet << ((length >> 40) & 255);
+        packet << ((length >> 32) & 255);
+        packet << ((length >> 24) & 255);
+        packet << ((length >> 16) & 255);
+        packet << ((length >> 8) & 255);
+        packet << ((length) & 255);
+    }
+    
+    packet.appendData((const char*)msg.contents(), msg.getLength_());
+    
+    sLog.outString("Sended messages : %d", packet.size());
+    
+    boost::asio::async_write(socket_,
+                             boost::asio::buffer(packet.contents(),
+                                                 packet.size()),
+                             boost::bind(&AuthSession::handle_write, shared_from_this(),
+                                         boost::asio::placeholders::error));
 }
 
 void AuthSession::decodeHeader(const boost::system::error_code& error){
@@ -144,7 +167,7 @@ void AuthSession::decodeData(const boost::system::error_code& error){
         packet.set_opcode_(packet.read<uint8>());
         packet.set_length_(received_message_->getSize() - 1);
         
-        OpcodeHandler const& opHandle = sOpcodeTable[packet.getOpcode()];
+        OpcodeHandler const& opHandle = sOpcodeTable[packet.getOpcode_()];
         (this->*opHandle.handler)(packet);
         
         delete received_message_; //Freeee bird
@@ -219,6 +242,14 @@ void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
     recvPacket >> username;
     recvPacket >> password;
     sLog.outString("Received login username : %s password : %s", username.c_str(), password.c_str());
+    AuthMessage sndPacket;
+    
+    sndPacket.set_opcode_(2);
+    sndPacket << (uint8)2;
+    sndPacket << (uint8)1;
+    sndPacket.set_length_(sndPacket.size());
+    
+    deliver(sndPacket);
 }
 
 void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
@@ -227,6 +258,7 @@ void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
     recvPacket >> password;
     recvPacket >> email;
     sLog.outString("Received register username : %s password : %s email : %s", username.c_str(), password.c_str(), email.c_str());
+    
 }
 
 void AuthSession::handleNull(AuthMessage& recvPacket){
