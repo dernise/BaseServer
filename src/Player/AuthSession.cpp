@@ -125,8 +125,9 @@ void AuthSession::decodeMask(const boost::system::error_code& error){
 void AuthSession::decodeData(const boost::system::error_code& error){
     if (!error)
     {
-        uint8 size=received_message_->getSize(), *mask = received_message_->getMask(), byte=0;
-        char message[size];
+        const uint64 size=received_message_->getSize();
+		uint8* mask = received_message_->getMask(), byte=0;
+		char message[1024];
         ByteBuffer extractor;
         
         //Extract and decrypt received data

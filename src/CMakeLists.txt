@@ -4,11 +4,27 @@ file (GLOB PLAYER Player/*.cpp Player/*.hpp)
 
 init_target (kingdom_server)
 
-build_executable (${TARGET_NAME} ${NETWORK} ${UTILS} ${PLAYER} main.cpp)
+include_directories(
+    ${MYSQL_INCLUDE_DIR}
+    ${OPENSSL_INCLUDE_DIR}
+  )
+
+add_executable (${TARGET_NAME} ${NETWORK} ${UTILS} ${PLAYER} main.cpp)
+
+if(WIN32)
+  target_link_libraries(${TARGET_NAME}
+    optimized ${MYSQL_LIBRARY}
+    optimized ${OPENSSL_LIBRARIES}
+    debug ${MYSQL_DEBUG_LIBRARY}
+    debug ${OPENSSL_DEBUG_LIBRARIES}
+  )
+  if(PLATFORM MATCHES X86)
+    target_link_libraries(${TARGET_NAME})
+  endif()
+endif()
 
 SOURCE_GROUP("Network" FILES ${NETWORK})
 SOURCE_GROUP("Utils" FILES ${UTILS})
 SOURCE_GROUP("Player" FILES ${PLAYER})
 
 link_boost()
-link_ssl()

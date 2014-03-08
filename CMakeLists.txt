@@ -1,16 +1,26 @@
 cmake_minimum_required( VERSION 2.8 )  
 project( EternalKingdom )  
 
-# ---- Get CPU information
-if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    MESSAGE( "64 bits compiler detected" )
-    SET( EX_PLATFORM 64 )
-    SET( EX_PLATFORM_NAME "x64" )
-else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) 
+if(WIN32)
+  if(PLATFORM MATCHES X86) # 32-bit
+    set(DEP_ARCH win32)
     MESSAGE( "32 bits compiler detected" )
-    SET( EX_PLATFORM 32 )
-    SET( EX_PLATFORM_NAME "x86" )
-endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+  else() # 64-bit
+    set(DEP_ARCH x64)
+    MESSAGE( "64 bits compiler detected" )
+  endif()
+endif()
+
+# Win32 delivered packages
+if(WIN32)
+  set(LIBS_DIR ${CMAKE_INSTALL_PREFIX}/bin) #set LIB DIR
+  set(MYSQL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/include/mysql)
+  set(MYSQL_LIBRARY ${CMAKE_SOURCE_DIR}/dep/lib/${DEP_ARCH}_release/libmySQL.lib)
+  set(MYSQL_DEBUG_LIBRARY ${CMAKE_SOURCE_DIR}/dep/lib/${DEP_ARCH}_debug/libmySQL.lib)
+  set(OPENSSL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/include)
+  set(OPENSSL_LIBRARIES ${CMAKE_SOURCE_DIR}/dep/lib/${DEP_ARCH}_release/libeay32.lib)
+  set(OPENSSL_DEBUG_LIBRARIES ${CMAKE_SOURCE_DIR}/dep/lib/${DEP_ARCH}_debug/libeay32.lib)
+endif()
 
 # ---- Get boost
 FIND_PACKAGE(Boost COMPONENTS system regex REQUIRED)
@@ -21,14 +31,16 @@ IF (Boost_FOUND)
 ENDIF()
 
 # ---- Openssl
-include(cmake/FindOpenSSL.cmake)
-FIND_PACKAGE(OpenSSL REQUIRED)
-IF(OPENSSL_FOUND)
-  INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR})
-  LIST(APPEND ADDITIONAL_LIBS ${OPENSSL_LIBRARIES})
-ELSE()
-  MESSAGE( "OPENSSL NOT FOUND, WILL NOT COMPILE" )
-ENDIF()
+if(UNIX)
+  include(cmake/FindOpenSSL.cmake)
+  FIND_PACKAGE(OpenSSL REQUIRED)
+  IF(OPENSSL_FOUND)
+    INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR})
+    LIST(APPEND ADDITIONAL_LIBS ${OPENSSL_LIBRARIES})
+  ELSE()
+    MESSAGE( "OPENSSL NOT FOUND, WILL NOT COMPILE" )
+  ENDIF()
+endif()
 
 #-----------------------------------------------------------------------------
 # We provide a few modules for our own needs to find and configure uncommon
@@ -39,5 +51,4 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include (Helpers)
 
-#add_subdirectory(dep)
 add_subdirectory(src)

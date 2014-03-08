@@ -11,13 +11,13 @@ public:
     WebSocketMessage() : ByteBuffer(0), m_opcode(0x82)
     {
     }
-    explicit WebSocketMessage(uint16 opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode) { }
+    explicit WebSocketMessage(uint8 opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode) { }
     
 	WebSocketMessage(const WebSocketMessage& packet) : ByteBuffer(packet), m_opcode(packet.m_opcode)
     {
     }
     
-	void Initialize(uint16 opcode, size_t newres = 200)
+	void Initialize(uint8 opcode, size_t newres = 200)
     {
         _storage.reserve(newres);
         m_opcode = opcode;
@@ -28,11 +28,11 @@ public:
 	uint64 getSize() const { return m_headerSize; }
     void setSize(uint64 size) { m_headerSize = size; }
 	uint16 GetOpcode() const { return m_opcode; }
-    void SetOpcode(uint16 opcode) { m_opcode = opcode; }
+    void SetOpcode(uint8 opcode) { m_opcode = opcode; }
     int GetMaskIndex() const { return m_maskIndex; }
     void SetMaskIndex(int maskIndex) { m_maskIndex = maskIndex; }
 protected:
-    int m_maskIndex = 0;
+    int m_maskIndex;
     uint8* m_mask;
 	uint64 m_headerSize;
 	uint8 m_opcode;

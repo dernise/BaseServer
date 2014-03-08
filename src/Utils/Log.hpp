@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string.h>
 #include "Types.hpp"
+#include <boost/asio.hpp>
 
 #if defined (WIN32)
 	#include <SDKDDKVer.h>
