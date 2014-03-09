@@ -105,6 +105,17 @@ std::string Logging::getCurrentTime()
     return buf;
 }
 
+std::string Logging::getCurrentLogTime()
+{
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%X", &tstruct);
+
+    return buf;
+}
+
 void Logging::outString(const char* str, ...) // Do not go higher than 1024
 {
     if (!str)
@@ -116,8 +127,7 @@ void Logging::outString(const char* str, ...) // Do not go higher than 1024
     va_start(ap,str);
     vsprintf(Buffer,str,ap);
     va_end(ap);
-	printf(Buffer);
-    printf("\n");
+	std::cout << getCurrentLogTime().data() << " : " << Buffer << std::endl;
     *m_file << getCurrentTime().data() << " : " <<  Buffer << std::endl; 
 	m_file->flush();
 	ResetColor(true);
@@ -134,8 +144,7 @@ void Logging::outError(const char* str, ...)
     va_start(ap,str);
     vsprintf(Buffer,str,ap);
     va_end(ap);
-	printf(Buffer);
-    printf("\n");
+	std::cout << getCurrentLogTime().data() << Buffer << std::endl;
 	*m_file << getCurrentTime().data() << " : " <<  Buffer << std::endl; 
 	m_file->flush();
 	ResetColor(true);
@@ -152,8 +161,7 @@ void Logging::outWarning(const char* str, ...)
     va_start(ap,str);
     vsprintf(Buffer,str,ap);
     va_end(ap);
-	printf(Buffer);
-    printf("\n");
+	std::cout << getCurrentLogTime().data() << Buffer << std::endl;
     *m_file << getCurrentTime().data() << " : " <<  Buffer << std::endl; 
 	m_file->flush();
 	ResetColor(true);

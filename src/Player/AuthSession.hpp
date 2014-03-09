@@ -13,6 +13,7 @@
 #include "Players.hpp"
 #include "../Network/Opcodes.hpp"
 #include "../Utils/HandshakeParser.hpp"
+#include "../Database/DatabaseQuery.hpp"
 
 using boost::asio::ip::tcp;
 

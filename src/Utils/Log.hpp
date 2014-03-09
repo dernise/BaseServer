@@ -60,6 +60,7 @@ public:
 private:
 	Logging(){}
     void SetColor(bool stdout_stream, Color color);
+	std::string getCurrentLogTime();
 	std::string getCurrentTime();
 	void ResetColor(bool stdout_stream);
 	int m_logLevel;

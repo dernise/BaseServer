@@ -15,32 +15,30 @@ void AuthSession::deliver(const AuthMessage& msg)
 {
     ByteBuffer packet;
     uint32 length = msg.getLength_();
-    
+	
     packet << (uint8)130;
     if(length <= 125){
-        packet << msg.getLength_();
+        packet << (uint8)msg.getLength_();
     }
     else if(length >= 126 && length <= 65535 )
     {
-        packet << 126;
-        packet << ((length >> 8) & 255);
-        packet << ((length) & 255);
+        packet << (uint8)126;
+        packet << (uint8)((length >> 8) & 255);
+        packet << (uint8)((length) & 255);
     }
     else{
-        packet << 127;
-        packet << ((length >> 56) & 255);
-        packet << ((length >> 48) & 255);
-        packet << ((length >> 40) & 255);
-        packet << ((length >> 32) & 255);
-        packet << ((length >> 24) & 255);
-        packet << ((length >> 16) & 255);
-        packet << ((length >> 8) & 255);
-        packet << ((length) & 255);
+        packet << (uint8)127;
+        packet << (uint8)((length >> 56) & 255);
+        packet << (uint8)((length >> 48) & 255);
+        packet << (uint8)((length >> 40) & 255);
+        packet << (uint8)((length >> 32) & 255);
+        packet << (uint8)((length >> 24) & 255);
+        packet << (uint8)((length >> 16) & 255);
+        packet << (uint8)((length >> 8) & 255);
+        packet << (uint8)((length) & 255);
     }
     
     packet.appendData((const char*)msg.contents(), msg.getLength_());
-    
-    sLog.outString("Sended messages : %d", packet.size());
     
     boost::asio::async_write(socket_,
                              boost::asio::buffer(packet.contents(),
@@ -249,7 +247,7 @@ void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
     sndPacket << (uint8)2;
     sndPacket << (uint8)1;
     sndPacket.set_length_(sndPacket.size());
-    
+
     deliver(sndPacket);
 }
 
@@ -259,7 +257,10 @@ void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
     recvPacket >> password;
     recvPacket >> email;
     sLog.outString("Received register username : %s password : %s email : %s", username.c_str(), password.c_str(), email.c_str());
-    
+
+	DatabaseQuery query;
+	query.createAccount(username, password, email);
+	query.releaseConnection();
 }
 
 void AuthSession::handleNull(AuthMessage& recvPacket){

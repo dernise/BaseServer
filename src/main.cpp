@@ -7,6 +7,7 @@
 #include "Utils/Log.hpp"
 #include "Network/AuthServer.hpp"
 #include "Network/Opcodes.hpp"
+#include "Utils/MysqlConnectionPool.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -25,6 +26,8 @@ int main(int argc, char* argv[])
         sLog.outString("  \\/\\_/  (____  /__|");
         sLog.outString("              \\/");
         
+		MysqlConnectionPool::getInstance().initializePool("server","n6q48D5746G6s3r","tcp://warleague.fr:3306","select 0  from dual;");
+
 		boost::asio::io_service io_service;
         tcp::endpoint endpoint(tcp::v4(), 8080);
         
