@@ -1,5 +1,13 @@
+# Warleague config file
+# On Windows : install boost in C:/boost and run CMAKE, should work
+# On Debian/Ubuntu : run apt-get install libboost-all-dev libmysqlcppconn-dev and run CMAKE, should work
+# On Mac : Run brew install mysql-connector-c++ boost and run CMAKE, should work
+# On FreeBSD : Untested
+
 cmake_minimum_required( VERSION 2.8 )  
 project( EternalKingdom )  
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 if(WIN32)
   if(PLATFORM MATCHES X86) # 32-bit
@@ -30,9 +38,8 @@ IF (Boost_FOUND)
     ADD_DEFINITIONS( "-DHAS_BOOST" )
 ENDIF()
 
-# ---- Openssl
+# ---- Openssl and mysql connector
 if(UNIX)
-  include(cmake/FindOpenSSL.cmake)
   FIND_PACKAGE(OpenSSL REQUIRED)
   IF(OPENSSL_FOUND)
     INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR})
@@ -40,15 +47,19 @@ if(UNIX)
   ELSE()
     MESSAGE( "OPENSSL NOT FOUND, WILL NOT COMPILE" )
   ENDIF()
+
+  FIND_PACKAGE(MySQLConnectorCPP)
+  IF(MYSQLCONNECTORCPP_FOUND)
+    INCLUDE_DIRECTORIES(${MYSQLCONNECTORCPP_INCLUDE_DIR})
+    LIST(APPEND ADDITIONAL_LIBS ${MYSQLCONNECTORCPP_LIBRARIES})
+    MESSAGE(${MYSQLCONNECTORCPP_LIBRARIES})
+  ELSE()  
+    MESSAGE( "MYSQL CONNECTOR NOT FOUND, WILL NOT COMPILE" )
+  ENDIF()
 endif()
 
-#-----------------------------------------------------------------------------
-# We provide a few modules for our own needs to find and configure uncommon
-# software on which we depend.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
+#-------------------------
 # Include our cmake macros
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include (Helpers)
 
 add_subdirectory(src)

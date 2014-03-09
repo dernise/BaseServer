@@ -23,6 +23,15 @@ if(WIN32)
   endif()
 endif()
 
+if(UNIX)
+    target_link_libraries(${TARGET_NAME} ${OPENSSL_LIBRARIES})
+endif()
+
+if(UNIX)
+    add_definitions("-Wno-shift-count-overflow -Wno-deprecated-declarations -Wno-format-security")
+endif()
+
+
 SOURCE_GROUP("Network" FILES ${NETWORK})
 SOURCE_GROUP("Utils" FILES ${UTILS})
 SOURCE_GROUP("Player" FILES ${PLAYER})
