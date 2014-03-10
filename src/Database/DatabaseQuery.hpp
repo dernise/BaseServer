@@ -1,8 +1,8 @@
 #ifndef _DATABASE_QUERY_H
 #define _DATABASE_QUERY_H
 
-#include <cppconn\connection.h>
-#include <cppconn\prepared_statement.h>
+#include <cppconn/connection.h>
+#include <cppconn/prepared_statement.h>
 #include <cppconn/statement.h>
 #include <cppconn/resultset.h>
 #include "../Utils/MysqlConnectionPool.hpp"

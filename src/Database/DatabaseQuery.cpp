@@ -26,5 +26,6 @@ void DatabaseQuery::createAccount(int id, string username, string password, stri
 	prep_stmt->setString(3, password);
 	prep_stmt->setString(4, email);
 	prep_stmt->executeQuery();
+	
 	conn_->commit();
 }
