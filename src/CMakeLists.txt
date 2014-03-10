@@ -25,13 +25,9 @@ if(WIN32)
 endif()
 
 if(UNIX)
-    target_link_libraries(${TARGET_NAME} ${OPENSSL_LIBRARIES})
-endif()
-
-if(UNIX)
+    target_link_libraries(${TARGET_NAME} ${OPENSSL_LIBRARIES} ${MYSQLCONNECTORCPP_LIBRARIES})
     add_definitions("-Wno-shift-count-overflow -Wno-deprecated-declarations -Wno-format-security")
 endif()
-
 
 SOURCE_GROUP("Network" FILES ${NETWORK})
 SOURCE_GROUP("Utils" FILES ${UTILS})

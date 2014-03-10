@@ -2,13 +2,13 @@
 #define _MYSQL_CONNECTION_POOL_H
 
 #include <map>
-#include <cppconn\driver.h>
-#include <cppconn\exception.h>
-#include <cppconn\connection.h>
-#include <cppconn\statement.h>
-#include <boost\thread\mutex.hpp>
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/connection.h>
+#include <cppconn/statement.h>
+#include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
-#include <boost\bind.hpp>
+#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "Log.hpp"
 
@@ -27,7 +27,7 @@ public:
 	}
 
 	void initializePool(string, string, string, string);
-	sql::Connection* MysqlConnectionPool::getConnection();
+	sql::Connection* getConnection();
 	void releaseConnection(sql::Connection* conn);
 private:
 	MysqlConnectionPool(){ }

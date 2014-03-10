@@ -31,7 +31,7 @@ if(WIN32)
 endif()
 
 # ---- Get boost
-FIND_PACKAGE(Boost COMPONENTS system regex REQUIRED)
+FIND_PACKAGE(Boost COMPONENTS system regex thread REQUIRED)
 IF (Boost_FOUND)
     link_directories( ${Boost_LIBRARY_DIRS} )
     INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})

@@ -258,9 +258,9 @@ void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
     recvPacket >> email;
     sLog.outString("Received register username : %s password : %s email : %s", username.c_str(), password.c_str(), email.c_str());
 
-	DatabaseQuery query;
-	query.createAccount(username, password, email);
-	query.releaseConnection();
+    DatabaseQuery query;
+    query.createAccount(username, password, email);
+    query.releaseConnection();
 }
 
 void AuthSession::handleNull(AuthMessage& recvPacket){
