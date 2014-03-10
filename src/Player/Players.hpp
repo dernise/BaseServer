@@ -15,7 +15,6 @@
 #include "../Network/Messages.hpp"
 #include "../Utils/Log.hpp"
 
-
 class Player
 {
 public:

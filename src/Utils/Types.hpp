@@ -1,6 +1,8 @@
 #ifndef _TYPES_H
 #define _TYPES_H
 
+#include <string.h>
+
 #ifdef INT_2_BYTES
 typedef char int8;
 typedef unsigned char uint8;
@@ -18,5 +20,11 @@ typedef unsigned int    uint32;
 typedef long long int64;
 typedef unsigned long long uint64;
 #endif
+
+typedef struct{
+	std::string username;
+	std::string password;
+	std::string email;
+} game_account;
 
 #endif

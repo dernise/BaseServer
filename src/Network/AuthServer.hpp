@@ -5,7 +5,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
+#include <cppconn/resultset.h>
+#include "../Utils/Types.hpp"
 #include "../Player/AuthSession.hpp"
+#include "../Database/DatabaseQuery.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -21,12 +24,13 @@ public:
   }
 
     void start_accept();
-
     void handle_accept(auth_session_ptr session, const boost::system::error_code& error);
-
+	void initGameAccounts();
+	std::map<int,game_account>* getAccountList(){ return &accounts_map; }
 private:
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;
+  std::map<int,game_account> accounts_map;
   PlayerList players;
 };
 
