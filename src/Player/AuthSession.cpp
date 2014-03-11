@@ -38,6 +38,7 @@ void AuthSession::deliver(const AuthMessage& msg)
         packet << (uint8)((length) & 255);
     }
     
+
     packet.appendData((const char*)msg.contents(), msg.getLength_());
     
     boost::asio::async_write(socket_,
