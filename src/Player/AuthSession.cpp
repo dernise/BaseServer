@@ -1,4 +1,5 @@
 #include "AuthSession.hpp"
+#include "../Network/AuthServer.hpp"
 
 void AuthSession::start()
 {
@@ -253,15 +254,33 @@ void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
 }
 
 void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
-    std::string username, password, email;
-    recvPacket >> username;
-    recvPacket >> password;
-    recvPacket >> email;
-    sLog.outString("Received register username : %s password : %s email : %s", username.c_str(), password.c_str(), email.c_str());
+    game_account newAcc;
+    recvPacket >> newAcc.username;
+    recvPacket >> newAcc.password;
+    recvPacket >> newAcc.email;
 
-    DatabaseQuery query;
-    query.createAccount(username, password, email);
-    query.releaseConnection();
+	map<int, game_account>::const_iterator itr;
+
+	for(itr = server_.getAccountList()->begin();itr != server_.getAccountList()->end(); ++itr){
+		if((*itr).second.username == newAcc.username) //Username already taken
+			return;
+		if((*itr).second.email == newAcc.email) //Email already taken
+			return;
+	}
+
+	// Mail Regex
+	boost::regex validationExpression = boost::regex("[a-zA-z0-9._]*+[@]+[a-zA-Z0-9-]*+[.]+[a-zA-Z0-9]*");
+	if(!boost::regex_match(newAcc.email, validationExpression)) //Mail is invalid
+		return;
+
+	int accountId = server_.getAccountList()->rbegin()->first + 1;
+	server_.getAccountList()->insert(std::pair<int,game_account>(accountId, newAcc));
+
+	DatabaseQuery query;
+	query.createAccount(accountId, newAcc.username, newAcc.password, newAcc.email);
+	query.releaseConnection();
+
+    sLog.outString("Received register username : %s password : %s email : %s", newAcc.username.c_str(), newAcc.password.c_str(), newAcc.email.c_str());
 }
 
 void AuthSession::handleNull(AuthMessage& recvPacket){

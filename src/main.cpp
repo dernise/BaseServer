@@ -32,7 +32,8 @@ int main(int argc, char* argv[])
         tcp::endpoint endpoint(tcp::v4(), 8080);
         
         AuthServer_ptr server(new AuthServer(io_service, endpoint));
-        sLog.outString("Initialized server on port 8080");
+		server->initGameAccounts();
+		sLog.outString("Initialized server on port 8080");
         io_service.run();
     }
     catch (std::exception& e)

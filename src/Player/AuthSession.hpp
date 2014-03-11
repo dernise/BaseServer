@@ -7,6 +7,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/regex.hpp>
 #include <iostream>
 #include <string.h>
 #include "../Network/Messages.hpp"
@@ -23,14 +24,17 @@ typedef struct {
     bool logged_in;
 } player_infos;
 
+class AuthServer;
+
 class AuthSession
     : public Player,
       public boost::enable_shared_from_this<AuthSession>
 {
 public:
-    AuthSession(boost::asio::io_service& io_service, PlayerList& player_list)
+    AuthSession(boost::asio::io_service& io_service, PlayerList& player_list, AuthServer& server)
     : socket_(io_service),
-        player_list_(player_list)
+        player_list_(player_list),
+		  server_(server)
     {
     }
 
@@ -78,6 +82,7 @@ private:
     player_infos informations_;
     tcp::socket socket_;
     PlayerList& player_list_;
+	AuthServer& server_;
 	char buffer_[1024];
     boost::asio::streambuf handshake_buffer_; //We cannot use a char* buffer with async_read_until :(
 	std::string handshake_answer_;
