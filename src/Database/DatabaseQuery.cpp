@@ -19,7 +19,7 @@ sql::ResultSet* DatabaseQuery::getAccountList(){
 
 void DatabaseQuery::createAccount(int id, string username, string password, string email){
 	sql::PreparedStatement  *prep_stmt;
-	prep_stmt = conn_->prepareStatement("INSERT INTO accounts(username, password, email) VALUES (?, ?, ?, ?)");
+	prep_stmt = conn_->prepareStatement("INSERT INTO accounts(id, username, password, email) VALUES (?, ?, ?, ?)");
 
 	prep_stmt->setInt(1, id);
 	prep_stmt->setString(2, username);

@@ -26,6 +26,7 @@ enum OpcodeList{
     CTS_LOGIN_CHALLENGE = 1,
     STC_LOGIN_ANSWER = 2,
     CTS_REGISTER_MESSAGE = 3,
+    STC_REGISTER_ANSWER = 4,
     END_OPCODE
 };
 

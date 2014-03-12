@@ -15,11 +15,11 @@ void AuthSession::start()
 void AuthSession::deliver(const AuthMessage& msg)
 {
     ByteBuffer packet;
-    uint32 length = msg.getLength_();
-	
+    uint32 length = msg.size();
+    
     packet << (uint8)130;
     if(length <= 125){
-        packet << (uint8)msg.getLength_();
+        packet << (uint8)length;
     }
     else if(length >= 126 && length <= 65535 )
     {
@@ -40,7 +40,7 @@ void AuthSession::deliver(const AuthMessage& msg)
     }
     
 
-    packet.appendData((const char*)msg.contents(), msg.getLength_());
+    packet.appendData((const char*)msg.contents(), length);
     
     boost::asio::async_write(socket_,
                              boost::asio::buffer(packet.contents(),
@@ -240,42 +240,90 @@ void AuthSession::handle_write(const boost::system::error_code& error)
 
 void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
     std::string username, password;
+    AuthMessage answer;
     recvPacket >> username;
     recvPacket >> password;
-    sLog.outString("Received login username : %s password : %s", username.c_str(), password.c_str());
-    AuthMessage sndPacket;
+    answer << (uint8)STC_LOGIN_ANSWER;
     
-    sndPacket.set_opcode_(2);
-    sndPacket << (uint8)2;
-    sndPacket << (uint8)1;
-    sndPacket.set_length_(sndPacket.size());
+    sLog.outString("Received login username : %s password : %s", username.c_str(), password.c_str());
 
-    deliver(sndPacket);
+    map<int, game_account>::const_iterator itr;
+    
+    for(itr = server_.getAccountList()->begin();itr != server_.getAccountList()->end(); ++itr){
+		if((*itr).second.username == username)
+		{
+            if((*itr).second.password == password){
+                answer << (uint8)1;
+                deliver(answer);
+                return;
+            }
+            else
+            {
+                answer << (uint8)2;
+                deliver(answer);
+                return;
+            }
+		}
+	}
+    
+    answer << (uint8)2;
+    deliver(answer);
 }
 
 void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
+    bool verificationPassed = true;
     game_account newAcc;
+    int accountId;
+    
     recvPacket >> newAcc.username;
     recvPacket >> newAcc.password;
     recvPacket >> newAcc.email;
 
+    AuthMessage answer;
+    answer << (uint8)STC_REGISTER_ANSWER;
+    
 	map<int, game_account>::const_iterator itr;
 
 	for(itr = server_.getAccountList()->begin();itr != server_.getAccountList()->end(); ++itr){
 		if((*itr).second.username == newAcc.username) //Username already taken
-			return;
-		if((*itr).second.email == newAcc.email) //Email already taken
-			return;
+		{
+            answer << (uint8)2;
+            verificationPassed = false;
+		}
+        if((*itr).second.email == newAcc.email) //Email already taken
+		{
+            answer << (uint8)3;
+            verificationPassed = false;
+        }
 	}
 
 	// Mail Regex
-	boost::regex validationExpression = boost::regex("[a-zA-z0-9._]*+[@]+[a-zA-Z0-9-]*+[.]+[a-zA-Z0-9]*");
-	if(!boost::regex_match(newAcc.email, validationExpression)) //Mail is invalid
+	boost::regex validation = boost::regex("[a-zA-z0-9._]*+[@]+[a-zA-Z0-9-]*+[.]+[a-zA-Z0-9]*");
+	if(!boost::regex_match(newAcc.email, validation)) //Mail is invalid
 		return;
-
-	int accountId = server_.getAccountList()->rbegin()->first + 1;
+    
+    // Username Regex
+    validation = boost::regex("[a-zA-Z]*");
+    if(!boost::regex_match(newAcc.username, validation))
+       return;
+    
+    // Check if verigication is ok
+    if(!verificationPassed){
+        deliver(answer); // Send answer
+        return;
+    }
+    
+    answer << (uint8)1;
+    deliver(answer);
+    
+    if(!server_.getAccountList()->empty())
+	  accountId = server_.getAccountList()->rbegin()->first + 1;
+    else
+      accountId = 1;
+    
 	server_.getAccountList()->insert(std::pair<int,game_account>(accountId, newAcc));
 
+    /* Todo : Do not autosave */
 	DatabaseQuery query;
 	query.createAccount(accountId, newAcc.username, newAcc.password, newAcc.email);
 	query.releaseConnection();
@@ -284,5 +332,5 @@ void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
 }
 
 void AuthSession::handleNull(AuthMessage& recvPacket){
-    
+    sLog.outError("Received a stupid packet");
 }
