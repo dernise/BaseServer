@@ -243,6 +243,10 @@ void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
     AuthMessage answer;
     recvPacket >> username;
     recvPacket >> password;
+    
+    string lowerUsername = username;
+    std::transform(lowerUsername.begin(), lowerUsername.end(), lowerUsername.begin(), ::tolower);
+    
     answer << (uint8)STC_LOGIN_ANSWER;
     
     sLog.outString("Received login username : %s password : %s", username.c_str(), password.c_str());
@@ -250,7 +254,7 @@ void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
     map<int, game_account>::const_iterator itr;
     
     for(itr = server_.getAccountList()->begin();itr != server_.getAccountList()->end(); ++itr){
-		if((*itr).second.username == username)
+		if((*itr).second.username == username || (*itr).second.username == lowerUsername)
 		{
             if((*itr).second.password == password){
                 answer << (uint8)1;
@@ -278,14 +282,16 @@ void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
     recvPacket >> newAcc.username;
     recvPacket >> newAcc.password;
     recvPacket >> newAcc.email;
-
+    string lowerUsername = newAcc.username;
+    std::transform(lowerUsername.begin(), lowerUsername.end(), lowerUsername.begin(), ::tolower);
+    
     AuthMessage answer;
     answer << (uint8)STC_REGISTER_ANSWER;
     
 	map<int, game_account>::const_iterator itr;
-
+    
 	for(itr = server_.getAccountList()->begin();itr != server_.getAccountList()->end(); ++itr){
-		if((*itr).second.username == newAcc.username) //Username already taken
+		if((*itr).second.username == newAcc.username || (*itr).second.username == lowerUsername) //Username already taken
 		{
             answer << (uint8)2;
             verificationPassed = false;
