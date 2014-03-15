@@ -304,7 +304,7 @@ void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
 	}
 
 	// Mail Regex
-	boost::regex validation = boost::regex("[a-zA-z0-9._]*+[@]+[a-zA-Z0-9-]*+[.]+[a-zA-Z0-9]*");
+	boost::regex validation = boost::regex("(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$");
 	if(!boost::regex_match(newAcc.email, validation)) //Mail is invalid
 		return;
     
