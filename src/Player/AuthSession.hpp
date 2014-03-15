@@ -18,23 +18,25 @@
 
 using boost::asio::ip::tcp;
 
-typedef struct {
+struct player_infos{
     int account_id;
     std::string account_name;
     bool logged_in;
-} player_infos;
+
+	player_infos(){
+	    logged_in=false;
+	}
+};
 
 class AuthServer;
 
 class AuthSession
-    : public Player,
+    : public Client,
       public boost::enable_shared_from_this<AuthSession>
 {
 public:
-    AuthSession(boost::asio::io_service& io_service, PlayerList& player_list, AuthServer& server)
-    : socket_(io_service),
-        player_list_(player_list),
-		  server_(server)
+    AuthSession(boost::asio::io_service& io_service, ClientList& client_list, PlayerList& player_list, AuthServer& server)
+    : socket_(io_service), client_list_(client_list), player_list_(player_list), server_(server)
     {
     }
 
@@ -45,25 +47,13 @@ public:
     {
         return socket_;
     }
-    
-    void set_account_id(int id){
-        informations_.account_id = id;
-    }
-    
-    int get_account_id(){
-        return informations_.account_id;
-    }
-    
-    void set_account_name(std::string name){
-        informations_.account_name = name;
-    }
-    
-    std::string get_account_name(){
+   
+	std::string get_account_name(){
         return informations_.account_name;
     }
     
-    void set_online(){
-        informations_.logged_in = true;
+	int get_account_id(){
+        return informations_.account_id;
     }
 
     void start();
@@ -74,14 +64,30 @@ public:
     void decodeHeader(const boost::system::error_code& error);
     void decodeMask(const boost::system::error_code& error);
     void decodeData(const boost::system::error_code& error);
+	void kick();
     void handleLoginChallenge(AuthMessage& recvPacket);
     void handleRegisterChallenge(AuthMessage& recvPacket);
     void handleNull(AuthMessage& recvPacket);
 
 private:
+	void connectPlayer(int id, std::string username);
+
+	void set_account_id(int id){
+        informations_.account_id = id;
+    }
+    
+    void set_account_name(std::string name){
+        informations_.account_name = name;
+    }
+  
+    void set_online(){
+        informations_.logged_in = true;
+    }
+
     player_infos informations_;
     tcp::socket socket_;
-    PlayerList& player_list_;
+    ClientList& client_list_;
+	PlayerList& player_list_;
 	AuthServer& server_;
 	char buffer_[1024];
     boost::asio::streambuf handshake_buffer_; //We cannot use a char* buffer with async_read_until :(

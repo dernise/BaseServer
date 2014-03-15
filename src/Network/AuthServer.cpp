@@ -2,7 +2,7 @@
 
 void AuthServer::start_accept()
 {
-    auth_session_ptr new_session(new AuthSession(io_service_, players, *this));
+    auth_session_ptr new_session(new AuthSession(io_service_, clients, players, *this));
     acceptor_.async_accept(new_session->socket(),
                            boost::bind(&AuthServer::handle_accept, this, new_session,
                                        boost::asio::placeholders::error));

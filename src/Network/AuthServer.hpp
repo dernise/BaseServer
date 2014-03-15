@@ -31,6 +31,7 @@ private:
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;
   std::map<int,game_account> accounts_map;
+  ClientList clients;
   PlayerList players;
 };
 

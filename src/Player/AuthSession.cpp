@@ -3,7 +3,7 @@
 
 void AuthSession::start()
 {
-    player_list_.join(shared_from_this());
+    client_list_.join(shared_from_this());
     sLog.outString("A new client connected : %s", socket_.remote_endpoint().address().to_string().c_str());
     
     boost::asio::async_read_until(socket_, handshake_buffer_, "\r\n\r\n",
@@ -63,7 +63,7 @@ void AuthSession::decodeHeader(const boost::system::error_code& error){
         
     if(received_message_->GetOpcode() != 130) //Check if it's the right opcode
     {
-        player_list_.remove(shared_from_this());
+        kick();
         return;
     }
         
@@ -94,7 +94,7 @@ void AuthSession::decodeHeader(const boost::system::error_code& error){
     }
     }
     else{
-        player_list_.remove(shared_from_this());
+        kick();
     }
 }
 
@@ -120,7 +120,7 @@ void AuthSession::decodeMask(const boost::system::error_code& error){
         //Set max size
         if(received_message_->getSize()>1024)
         {
-            player_list_.remove(shared_from_this());
+            kick();
             return;
         }
     
@@ -141,7 +141,7 @@ void AuthSession::decodeMask(const boost::system::error_code& error){
     
     }
     else{
-        player_list_.remove(shared_from_this());
+        kick();
     }
 }
 
@@ -180,7 +180,7 @@ void AuthSession::decodeData(const boost::system::error_code& error){
 
     }
     else{
-        player_list_.remove(shared_from_this());
+        kick();
     }
 }
 
@@ -195,7 +195,7 @@ void AuthSession::parseHanshake(const boost::system::error_code& error){
         if(command != "GET / HTTP/1.1\r")
         {
             sLog.outWarning("A nasty guy tried to connect outside of a browser or is using internet explorer");
-            player_list_.remove(shared_from_this());
+            kick();
             return;
         }
         
@@ -203,7 +203,7 @@ void AuthSession::parseHanshake(const boost::system::error_code& error){
         std::string handshakeSecKey = parser.getValue("Sec-WebSocket-Key");
         
         if(handshakeSecKey == "unknown"){
-            player_list_.remove(shared_from_this());
+            kick();
             return;
         }
         
@@ -224,7 +224,7 @@ void AuthSession::parseHanshake(const boost::system::error_code& error){
     }
     else
     {
-        player_list_.remove(shared_from_this());
+        kick();
     }
 }
 
@@ -234,7 +234,7 @@ void AuthSession::handle_write(const boost::system::error_code& error)
     }
     else
     {
-        player_list_.remove(shared_from_this());
+        kick();
     }
 }
 
@@ -248,8 +248,6 @@ void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
     std::transform(lowerUsername.begin(), lowerUsername.end(), lowerUsername.begin(), ::tolower);
     
     answer << (uint8)STC_LOGIN_ANSWER;
-    
-    sLog.outString("Received login username : %s password : %s", username.c_str(), password.c_str());
 
     map<int, game_account>::const_iterator itr;
     
@@ -258,6 +256,7 @@ void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
 		{
             if((*itr).second.password == password){
                 answer << (uint8)1;
+				connectPlayer((*itr).first, (*itr).second.username);
                 deliver(answer);
                 return;
             }
@@ -272,6 +271,25 @@ void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
     
     answer << (uint8)2;
     deliver(answer);
+}
+
+void AuthSession::connectPlayer(int id, std::string username){
+	player_list_.join(shared_from_this()); // Add the account to the player list
+	
+	//Set the account informations
+	informations_.account_id = id;
+	informations_.account_name = username;
+	informations_.logged_in = true;
+
+	sLog.outString("Connected player %s", username.c_str());
+}
+
+void AuthSession::kick(){
+	if(informations_.logged_in){ //remove from the player list
+		player_list_.remove(shared_from_this());
+	}
+
+	client_list_.remove(shared_from_this()); //remove from the whole client list
 }
 
 void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
@@ -337,6 +355,8 @@ void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
     sLog.outString("Received register username : %s password : %s email : %s", newAcc.username.c_str(), newAcc.password.c_str(), newAcc.email.c_str());
 }
 
+
+
 void AuthSession::handleNull(AuthMessage& recvPacket){
-    sLog.outError("Received a stupid packet");
+    sLog.outError("Received an unknow packet");
 }

@@ -15,36 +15,60 @@
 #include "../Network/Messages.hpp"
 #include "../Utils/Log.hpp"
 
-class Player
+class Client
 {
 public:
-  virtual ~Player() {}
+  virtual ~Client() {}
   virtual void deliver(const AuthMessage& msg) = 0;
 };
 
-typedef boost::shared_ptr<Player> playerPtr;
+typedef boost::shared_ptr<Client> clientPtr;
+
+class ClientList
+{
+public:
+  void join(clientPtr client)
+  {
+    connectedClients.insert(client);
+  }
+
+  void remove(clientPtr client)
+  {
+      connectedClients.erase(client);
+      sLog.outString("A client left the game");
+  }
+
+  void sendToAll(const AuthMessage& msg)
+  {
+    std::for_each(connectedClients.begin(), connectedClients.end(),
+        boost::bind(&Client::deliver, _1, boost::ref(msg)));
+  }
+
+private:
+  std::set<clientPtr> connectedClients;
+};
 
 class PlayerList
 {
 public:
-  void join(playerPtr player)
+  void join(clientPtr client)
   {
-    connectedPlayers.insert(player);
+    connectedPlayers.insert(client);
   }
 
-  void remove(playerPtr player)
+  void remove(clientPtr client)
   {
-      connectedPlayers.erase(player);
+      connectedPlayers.erase(client);
       sLog.outString("A player left the game");
   }
 
   void sendToAll(const AuthMessage& msg)
   {
     std::for_each(connectedPlayers.begin(), connectedPlayers.end(),
-        boost::bind(&Player::deliver, _1, boost::ref(msg)));
+        boost::bind(&Client::deliver, _1, boost::ref(msg)));
   }
 
 private:
-  std::set<playerPtr> connectedPlayers;
+  std::set<clientPtr> connectedPlayers;
 };
 #endif
