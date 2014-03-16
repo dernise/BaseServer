@@ -168,8 +168,15 @@ void AuthSession::decodeData(const boost::system::error_code& error){
         packet.set_length_(received_message_->getSize() - 1);
         
         OpcodeHandler const& opHandle = sOpcodeTable[packet.getOpcode_()];
-        (this->*opHandle.handler)(packet);
+
+		//If authed packet and not leggedin
+		if(opHandle.status == STATUS_LOGGEDIN && !informations_.logged_in){
+			kick();
+			return;
+		}
         
+		(this->*opHandle.handler)(packet);
+
         delete received_message_; //Freeee bird
         
         //Loop, reading new data :)
@@ -355,7 +362,17 @@ void AuthSession::handleRegisterChallenge(AuthMessage& recvPacket){
     sLog.outString("Received register username : %s password : %s email : %s", newAcc.username.c_str(), newAcc.password.c_str(), newAcc.email.c_str());
 }
 
+void AuthSession::handleMessage(AuthMessage& recvPacket){
+	std::string receivedMessage, message;
+	AuthMessage answer;
 
+	recvPacket >> message;
+	receivedMessage += (informations_.account_name + " : " + message); //Add pseudo to message
+
+	answer << (uint8)STC_MESSAGE;
+	answer << receivedMessage;
+	player_list_.sendToAll(answer);
+}
 
 void AuthSession::handleNull(AuthMessage& recvPacket){
     sLog.outError("Received an unknow packet");

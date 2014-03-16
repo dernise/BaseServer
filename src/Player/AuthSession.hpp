@@ -68,7 +68,7 @@ public:
     void handleLoginChallenge(AuthMessage& recvPacket);
     void handleRegisterChallenge(AuthMessage& recvPacket);
     void handleNull(AuthMessage& recvPacket);
-
+	void handleMessage(AuthMessage& recvPacket);
 private:
 	void connectPlayer(int id, std::string username);
 
