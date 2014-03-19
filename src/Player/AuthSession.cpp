@@ -281,8 +281,13 @@ void AuthSession::handleLoginChallenge(AuthMessage& recvPacket){
 }
 
 void AuthSession::connectPlayer(int id, std::string username){
+	//Check if the player is not already connect, if so, kick him
+	if(player_list_.isOnline(username)){
+		player_list_.kickPlayer(username);
+	}
+
 	player_list_.join(shared_from_this()); // Add the account to the player list
-	
+
 	//Set the account informations
 	informations_.account_id = id;
 	informations_.account_name = username;
@@ -292,6 +297,8 @@ void AuthSession::connectPlayer(int id, std::string username){
 }
 
 void AuthSession::kick(){
+	socket_.close();
+
 	if(informations_.logged_in){ //remove from the player list
 		player_list_.remove(shared_from_this());
 	}

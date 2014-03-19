@@ -15,11 +15,27 @@
 #include "../Network/Messages.hpp"
 #include "../Utils/Log.hpp"
 
+struct player_infos{
+    int account_id;
+    std::string account_name;
+    bool logged_in;
+
+	player_infos(){
+	    logged_in=false;
+	}
+};
+
 class Client
 {
 public:
   virtual ~Client() {}
   virtual void deliver(const AuthMessage& msg) = 0;
+  virtual void kick() = 0;
+  virtual player_infos getPlayerInformations(){ 
+	return informations_;
+  }
+protected:
+  player_infos informations_;
 };
 
 typedef boost::shared_ptr<Client> clientPtr;
@@ -68,6 +84,28 @@ public:
         boost::bind(&Client::deliver, _1, boost::ref(msg)));
   }
 
+  void kickPlayer(std::string username){
+	  std::set<clientPtr>::iterator it;	
+	  for (it = connectedPlayers.begin(); it != connectedPlayers.end(); ++it){
+		  if((*it)->getPlayerInformations().account_name == username)
+		  {
+			  sLog.outString("Kicked player");
+			  (*it)->kick();		
+			  return;
+		  }
+	  }
+  }
+
+  bool isOnline(std::string username){
+      std::set<clientPtr>::iterator it;	
+	  for (it = connectedPlayers.begin(); it != connectedPlayers.end(); ++it){
+		  if((*it)->getPlayerInformations().account_name == username)
+		  {
+			  return true;
+		  }
+	  }
+	  return false;
+  }
 private:
   std::set<clientPtr> connectedPlayers;
 };

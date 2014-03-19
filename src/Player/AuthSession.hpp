@@ -18,16 +18,6 @@
 
 using boost::asio::ip::tcp;
 
-struct player_infos{
-    int account_id;
-    std::string account_name;
-    bool logged_in;
-
-	player_infos(){
-	    logged_in=false;
-	}
-};
-
 class AuthServer;
 
 class AuthSession
@@ -84,7 +74,6 @@ private:
         informations_.logged_in = true;
     }
 
-    player_infos informations_;
     tcp::socket socket_;
     ClientList& client_list_;
 	PlayerList& player_list_;
