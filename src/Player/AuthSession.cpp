@@ -366,15 +366,18 @@ void AuthSession::handleMessage(AuthMessage& recvPacket){
 	std::string receivedMessage, message;
 	AuthMessage answer;
 
-	recvPacket >> message;
-    using boost::algorithm::replace_all;
+	recvPacket >> message; //Read the message
+    
+    using boost::algorithm::replace_all; //Replace escape HTML caracters
     replace_all(message, "&",  "&amp;");
     replace_all(message, "\"", "&quot;");
     replace_all(message, "\'", "&apos;");
     replace_all(message, "<",  "&lt;");
     replace_all(message, ">",  "&gt;");
-	receivedMessage += (informations_.account_name + " : " + message); //Add pseudo to message
-
+	
+    receivedMessage += (informations_.account_name + " : " + message); //Add pseudo to message
+    sLog.outString(receivedMessage.c_str());
+    
 	answer << (uint8)STC_MESSAGE;
 	answer << receivedMessage;
 	player_list_.sendToAll(answer);
