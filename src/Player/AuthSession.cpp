@@ -367,6 +367,12 @@ void AuthSession::handleMessage(AuthMessage& recvPacket){
 	AuthMessage answer;
 
 	recvPacket >> message;
+    using boost::algorithm::replace_all;
+    replace_all(message, "&",  "&amp;");
+    replace_all(message, "\"", "&quot;");
+    replace_all(message, "\'", "&apos;");
+    replace_all(message, "<",  "&lt;");
+    replace_all(message, ">",  "&gt;");
 	receivedMessage += (informations_.account_name + " : " + message); //Add pseudo to message
 
 	answer << (uint8)STC_MESSAGE;
