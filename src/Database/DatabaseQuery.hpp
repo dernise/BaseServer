@@ -12,6 +12,7 @@ public:
 	DatabaseQuery();
 	
 	sql::ResultSet* getAccountList();
+	sql::ResultSet* getFriendships();
 	void releaseConnection();
 	void createAccount(int id, string username, string password, string email);
 private:

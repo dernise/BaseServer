@@ -33,4 +33,21 @@ void AuthServer::initGameAccounts(){
 	}
 	
 	sLog.outString("Loaded accounts from the database");
+	loadFriendships();
+}
+
+void AuthServer::loadFriendships(){
+	sql::ResultSet *result;
+	
+	DatabaseQuery query;
+	result = query.getFriendships();
+
+	while(result->next()){
+		friendship tfriend;
+		tfriend.account_id = result->getInt("accountId");
+		tfriend.account_id = result->getInt("friendId");
+		friendships_map[result->getInt("id")] = tfriend;
+	}
+
+	sLog.outString("Loaded all friendships");
 }

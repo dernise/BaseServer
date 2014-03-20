@@ -28,11 +28,14 @@ public:
 	void initGameAccounts();
 	std::map<int,game_account>* getAccountList(){ return &accounts_map; }
 private:
-  boost::asio::io_service& io_service_;
-  tcp::acceptor acceptor_;
-  std::map<int,game_account> accounts_map;
-  ClientList clients;
-  PlayerList players;
+    void loadFriendships();
+
+    boost::asio::io_service& io_service_;
+    tcp::acceptor acceptor_;
+    std::map<int,game_account> accounts_map; 
+    std::map<int,friendship> friendships_map;
+    ClientList clients;
+    PlayerList players;
 };
 
 typedef boost::shared_ptr<AuthServer> AuthServer_ptr;

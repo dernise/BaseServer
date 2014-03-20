@@ -17,6 +17,15 @@ sql::ResultSet* DatabaseQuery::getAccountList(){
 	return res;
 }
 
+sql::ResultSet* DatabaseQuery::getFriendships(){
+	sql::Statement *stmt;
+	sql::ResultSet *res;
+
+	stmt = conn_->createStatement();
+	res = stmt->executeQuery("SELECT * FROM friendships");
+	return res;
+}
+
 void DatabaseQuery::createAccount(int id, string username, string password, string email){
 	sql::PreparedStatement  *prep_stmt;
 	prep_stmt = conn_->prepareStatement("INSERT INTO accounts(id, username, password, email) VALUES (?, ?, ?, ?)");

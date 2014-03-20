@@ -382,7 +382,7 @@ void AuthSession::handleMessage(AuthMessage& recvPacket){
     replace_all(message, "<",  "&lt;");
     replace_all(message, ">",  "&gt;");
 	
-    receivedMessage += (informations_.account_name + " : " + message); //Add pseudo to message
+    receivedMessage = (informations_.account_name + " : " + message); //Add pseudo to message
     sLog.outString(receivedMessage.c_str());
     
 	answer << (uint8)STC_MESSAGE;

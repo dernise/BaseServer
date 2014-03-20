@@ -27,4 +27,8 @@ typedef struct{
 	std::string email;
 } game_account;
 
+typedef struct{
+	int account_id;
+	int friend_id;
+} friendship;
 #endif
